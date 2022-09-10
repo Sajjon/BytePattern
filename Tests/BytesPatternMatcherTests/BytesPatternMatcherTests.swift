@@ -9,7 +9,7 @@ import Foundation
 @testable import BytesPatternMatcher
 
 final class BytesPatternMatcherTests: XCTestCase {
-    fileprivate let sut = PatternMatcher()
+    fileprivate let sut = BytesPatternMatcher()
     
     func testIdentical() throws {
         let lhs = try Data(hex: "dead beef 1234 5678 abba 0912 deed fade")

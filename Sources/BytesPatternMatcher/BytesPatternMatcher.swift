@@ -59,7 +59,7 @@ import Algorithms
 /// `.almostIdentical([.endianessSwapped(for: .uint16), .reversed(.orderOfIntegers), .reversed(.entireSequenceAsBytes)])
 /// would result in the `identity`, i.e. `identical`, and does not work for just `uint16` but for any int.
 ///
-public struct PatternMatcher {
+public struct BytesPatternMatcher {
     public init() {}
 }
 
@@ -481,7 +481,7 @@ extension Storage {
     }
 }
 
-public extension PatternMatcher {
+public extension BytesPatternMatcher {
     func find(
         between lhsContiguousBytes: some ContiguousBytes,
         and rhsContiguousBytes: some ContiguousBytes

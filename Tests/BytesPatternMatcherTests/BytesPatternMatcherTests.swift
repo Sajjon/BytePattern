@@ -6,38 +6,18 @@
 //
 import XCTest
 import Foundation
-@testable import BytesPatternMatcher
+import BytesMutation
+import BytesPatternMatcher
 
 final class BytesPatternMatcherTests: XCTestCase {
+  
     fileprivate let sut = BytesPatternMatcher()
     
-    func testIdentical() throws {
-        let lhs = try Data(hex: "dead beef 1234 5678 abba 0912 deed fade")
-        let rhs = try Data(hex: "dead beef 1234 5678 abba 0912 deed fade")
-        XCTAssertEqual(
-            sut.find(between: lhs, and: rhs),
-            .identical
-        )
+    override func setUp() {
+        super.setUp()
+        continueAfterFailure = false
     }
     
-    func atestAlmostSameReversedSequenceAsBytesShort() throws {
-        let lhs = try Data(hex: "ab12 cd34")
-        let rhs = try Data(hex: "34cd 12ab")
-        XCTAssertEqual(
-            sut.find(between: lhs, and: rhs),
-            .almostSame([.reversed(.entireSequenceAsBytes)])
-        )
-    }
-   
-    func atestAlmostSameReversedSequenceAsBytes() throws {
-        let lhs = try Data(hex: "dead beef 1234 5678 abba 0912 deed fade")
-        let rhs = try Data(hex: "defa edde 1209 baab 7856 3412 efbe adde")
-        
-        XCTAssertEqual(
-            sut.find(between: lhs, and: rhs),
-            .almostSame([.reversed(.entireSequenceAsBytes)])
-        )
-    }
     
     func test_reverse_bits_in_byte() {
         func invert(_ byte: UInt8) -> UInt8 {
@@ -72,84 +52,173 @@ final class BytesPatternMatcherTests: XCTestCase {
         doTestMagic(invert: 0x34, expected: 0x43)
     }
     
-    func atestAlmostSameReversedSequenceAsHexShort() throws {
-        let lhs = try Data(hex: "ab12 cd34")
-        let rhs = try Data(hex: "43dc 21ba")
-        XCTAssertEqual(
-            sut.find(between: lhs, and: rhs),
-            .almostSame([.reversed(.entireSequenceAsHex)])
-        )
-    }
-    
-    func atestAlmostSameReversedSequenceAsHex() throws {
+    func test_identical() throws {
         let lhs = try Data(hex: "dead beef 1234 5678 abba 0912 deed fade")
-        let rhs = try Data(hex: "edaf deed 2190 abba 8765 4321 feeb daed")
-        
+        let rhs = try Data(hex: "dead beef 1234 5678 abba 0912 deed fade")
         XCTAssertEqual(
             sut.find(between: lhs, and: rhs),
-            .almostSame([.reversed(.entireSequenceAsHex)])
+            .identical
         )
     }
     
-    func testAlmostSameReversedOrderOfIntegersUInt16EvenIntegerAmount() throws {
-        let lhs = try Data(hex: "dead beef 1234 5678")
-        let rhs = try Data(hex: "5678 1234 beef dead")
-        XCTAssertEqual(
-            sut.find(between: lhs, and: rhs),
-            .almostSame([.reversed(.orderOfIntegers(.uint16))])
-        )
+    func test_sameIfRHS_reversed_short() throws {
+        try doTestHex(
+            lhs: "ab12 cd34",
+            rhs: "34cd 12ab",
+            expectedPattern: .sameIfRHS([.reversed])
+        ) { rhs in
+            rhs.reversed()
+        }
+    }
+
+    func test_sameIfRHS_reversed() throws {
+        try doTestHex(
+            lhs: "dead beef 1234 5678 abba 0912 deed fade",
+            rhs: "defa edde 1209 baab 7856 3412 efbe adde",
+            expectedPattern: .sameIfRHS([.reversed])
+        ) { rhs in
+            rhs.reversed()
+        }
+    }
+ 
+
+    func test_sameIfRHS_reversedHex_short() throws {
+        try doTestHex(
+            lhs: "ab12 cd34",
+            rhs: "43dc 21ba",
+            expectedPattern: .sameIfRHS([.reversedHex])
+        ) { rhs in
+            rhs.reversedHex()
+        }
+    }
+
+    func test_sameIfRHS_reversedHex() throws {
+        try doTestHex(
+            lhs: "dead beef 1234 5678 abba 0912 deed fade",
+            rhs: "edaf deed 2190 abba 8765 4321 feeb daed",
+            expectedPattern: .sameIfRHS([.reversedHex])
+        ) { rhs in
+            rhs.reversedHex()
+        }
+    }
+ 
+    func test_sameIfRHS_asSegmentsOfUInt16ButReversedOrder_even_number_of_uint16() throws {
+        try doTestHex(
+            lhs: "dead beef 1234 5678",
+            rhs: "5678 1234 beef dead",
+            expectedPattern: .sameIfRHS([.asSegmentsOfUInt16ButReversedOrder])
+        ) { rhs in
+            rhs.asSegmentsOfUInt16ButReversedOrder()
+        }
+    }
+
+    func test_sameIfRHS_asSegmentsOfUInt16ButReversedOrder_odd_number_of_uint16() throws {
+        try doTestHex(
+            lhs: "dead beef 1234",
+            rhs: "1234 beef dead",
+            expectedPattern: .sameIfRHS([.asSegmentsOfUInt16ButReversedOrder])
+        ) { rhs in
+            rhs.asSegmentsOfUInt16ButReversedOrder()
+        }
+    }
+
+    func test_sameIfRHS_asSegmentsOfUInt16ButEndianessSwapped_short() throws {
+        try doTestHex(
+            lhs: "ab12 cd34",
+            rhs: "12ab 34cd",
+            expectedPattern: .sameIfRHS([.asSegmentsOfUInt16ButEndianessSwapped])
+        ) { rhs in
+            rhs.asSegmentsOfUInt16ButEndianessSwapped()
+        }
+    }
+ 
+    func test_sameIfRHS_asSegmentsOfUInt16ButEndianessSwapped() throws {
+        try doTestHex(
+            lhs: "dead beef 1234 5678 abba 0912 deed fade",
+            rhs: "adde efbe 3412 7856 baab 1209 edde defa",
+            expectedPattern: .sameIfRHS([.asSegmentsOfUInt16ButEndianessSwapped])
+        ) { rhs in
+            rhs.asSegmentsOfUInt16ButEndianessSwapped()
+        }
+    }
+   
+    func test_sameIfRHS_asSegmentsOfUInt32ButEndianessSwapped() throws {
+        try doTestHex(
+            lhs: "deadbeef 12345678 abba0912 deedfade",
+            rhs: "efbeadde 78563412 1209baab defaedde",
+            expectedPattern: .sameIfRHS([.asSegmentsOfUInt32ButEndianessSwapped])
+        ) { rhs in
+            rhs.asSegmentsOfUInt32ButEndianessSwapped()
+        }
     }
     
-    func testAlmostSameReversedOrderOfIntegersUInt16OddIntegerAmount() throws {
-        let lhs = try Data(hex: "dead beef 1234")
-        let rhs = try Data(hex: "1234 beef dead")
-        XCTAssertEqual(
-            sut.find(between: lhs, and: rhs),
-            .almostSame([.reversed(.orderOfIntegers(.uint16))])
-        )
+
+    func test_sameIfRHS__asSegmentsOfUInt64ButEndianessSwapped() throws {
+
+        try doTestHex(
+            lhs: "deadbeef12345678 abba0912deedfade",
+            rhs: "78563412efbeadde defaedde1209baab",
+            expectedPattern: .sameIfRHS([.asSegmentsOfUInt64ButEndianessSwapped])
+        ) { rhs in
+            rhs.asSegmentsOfUInt64ButEndianessSwapped()
+        }
     }
     
-    func atestAlmostSameEndianessSwappedForUInt16Short() throws {
-        let lhs = try Data(hex: "ab12 cd34")
-        let rhs = try Data(hex: "12ab 34cd")
-        XCTAssertEqual(
-            sut.find(between: lhs, and: rhs),
-            .almostSame([.endianessSwapped(for: .uint16)])
-        )
+    func test_sameIfRHS_asSegmentsOfUInt16ButEndianessSwapped_asSegmentsOfUInt16ButReversedOrder_reversedHex() throws {
+        try doTestHex(
+            lhs: "dead beef 1234",
+            rhs: "edda ebfe 2143",
+            expectedPattern: .sameIfRHS([.asSegmentsOfUInt16ButEndianessSwapped, .asSegmentsOfUInt16ButReversedOrder, .reversedHex])
+        ) { rhs in
+            rhs
+                .asSegmentsOfUInt16ButEndianessSwapped()
+                .asSegmentsOfUInt16ButReversedOrder()
+                .reversedHex()
+        }
     }
-    func testAlmostSameEndianessSwappedForUInt16() throws {
-        let lhs = try Data(hex: "dead beef 1234 5678 abba 0912 deed fade")
-        let rhs = try Data(hex: "adde efbe 3412 7856 baab 1209 edde defa")
+}
+
+extension BytesPatternMatcherTests {
+    func doTest<RHS: ContiguousBytes>(
+        lhs: some ContiguousBytes,
+        rhs: RHS,
+        expectedPattern: BytesPattern,
+        line: UInt = #line,
+        mutateRHS: (RHS) -> some ContiguousBytes
+    ) throws {
+        let pattern = sut.find(between: lhs, and: rhs)
         XCTAssertEqual(
-            sut.find(between: lhs, and: rhs),
-            .almostSame([.endianessSwapped(for: .uint16)])
+           pattern,
+           expectedPattern,
+           "Found pattern does not match expected, found: \(String(describing: pattern)), expected: \(expectedPattern)",
+           line: line
         )
+        let mutatedRHS = mutateRHS(rhs)
+        lhs.withUnsafeBytes { lhsBytes in
+            mutatedRHS.withUnsafeBytes { mutatedRHSBytes in
+                XCTAssertTrue(
+                    safeCompare(lhsBytes, mutatedRHSBytes),
+                    "expected LHS \(lhsBytes.hex) to equal \(mutatedRHSBytes.hex) but they are not equal.",
+                    line: line
+                )
+            }
+        }
     }
     
-    func testAlmostSameEndianessSwappedForUInt32() throws {
-        let lhs = try Data(hex: "deadbeef 12345678 abba0912 deedfade")
-        let rhs = try Data(hex: "efbeadde 78563412 1209baab defaedde")
-        XCTAssertEqual(
-            sut.find(between: lhs, and: rhs),
-            .almostSame([.endianessSwapped(for: .uint32)])
-        )
-    }
     
-    func testAlmostSameEndianessSwappedForUInt64() throws {
-        let lhs = try Data(hex: "deadbeef12345678 abba0912deedfade")
-        let rhs = try Data(hex: "78563412efbeadde defaedde1209baab")
-        XCTAssertEqual(
-            sut.find(between: lhs, and: rhs),
-            .almostSame([.endianessSwapped(for: .uint64)])
-        )
-    }
-    
-    func testAlmostSameEndianessSwappedUInt16ReversedOrderOfIntegersReveresEntireSequenceAsHex() throws {
-        let lhs = try Data(hex: "dead beef 1234")
-        let rhs = try Data(hex: "edda ebfe 2143")
-        XCTAssertEqual(
-            sut.find(between: lhs, and: rhs),
-            .almostSame([.endianessSwapped(for: .uint16), .reversed(.orderOfIntegers(.uint16)), .reversed(.entireSequenceAsHex)])
+    func doTestHex(
+        lhs: String,
+        rhs: String,
+        expectedPattern: BytesPattern,
+        line: UInt = #line,
+        mutateRHS: @escaping (any ContiguousBytes) -> some ContiguousBytes
+    ) throws {
+        try doTest(
+            lhs: Data(hex: lhs),
+            rhs: Data(hex: rhs),
+            expectedPattern: expectedPattern,
+            line: line,
+            mutateRHS: mutateRHS
         )
     }
 }

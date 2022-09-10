@@ -23,10 +23,17 @@ let package = Package(
             dependencies: [
                 .product(name: "Algorithms", package: "swift-algorithms"),
             ]),
+        .target(
+            name: "BytesMutation",
+            dependencies: [
+                "BytesPatternMatcher",
+                .product(name: "Algorithms", package: "swift-algorithms"),
+            ]),
         .testTarget(
             name: "BytesPatternMatcherTests",
             dependencies: [
                 "BytesPatternMatcher",
+                "BytesMutation",
                 .product(name: "Algorithms", package: "swift-algorithms"),
             ]),
     ]

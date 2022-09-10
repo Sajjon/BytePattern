@@ -101,6 +101,11 @@ public extension ContiguousBytes {
             Data($0)
         }
     }
+    var bytes: [UInt8] {
+        withUnsafeBytes {
+            [UInt8]($0)
+        }
+    }
 }
 
 public extension FixedWidthInteger {

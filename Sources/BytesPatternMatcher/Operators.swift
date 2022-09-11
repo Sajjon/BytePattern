@@ -22,6 +22,6 @@ public func circularRightShift(_ input: UInt8, _ amount: UInt8) -> UInt8 {
     return (input >> amount) | (input << (8 - amount))
 }
 
-public func inverseBits(of byte: UInt8) -> UInt8 {
+public func rotateBits(of byte: UInt8) -> UInt8 {
     circularRightShift(byte, 4)
 }

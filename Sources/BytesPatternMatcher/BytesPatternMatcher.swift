@@ -132,22 +132,13 @@ extension FixedWidthInteger {
     }
 }
 
-
-
 extension Data {
-    init<I>(integers: [I], bigEndian: Bool = false) where I: Integer {
+    init<I>(integers: [I], bigEndian: Bool = false) where I: FixedWidthInteger {
         self = integers
             .map({ bigEndian ? $0.bigEndian.data : $0.data })
             .reduce(Data()) { $0 + $1 }
     }
 }
-
-public protocol Integer: FixedWidthInteger & Hashable { // & UnsignedInteger
-    static var byteCount: Int { get }
-}
-extension UInt64: Integer {}
-extension UInt32: Integer {}
-extension UInt16: Integer {}
 
 extension FixedWidthInteger {
     

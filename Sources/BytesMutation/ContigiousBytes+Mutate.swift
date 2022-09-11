@@ -11,16 +11,16 @@ import Algorithms
 
 private extension ContiguousBytes {
    
-    func into<U: FixedWidthInteger>(
-        _ intType: U.Type,
+    func into<I: FixedWidthInteger>(
+        _ intType: I.Type,
         bigEndian: Bool = false
-    ) -> [U]? {
+    ) -> [I]? {
         withUnsafeBytes { bytes in
-            guard bytes.count >= U.byteCount else { return nil }
-            guard bytes.count.isMultiple(of: U.byteCount) else { return nil }
-            return bytes.chunks(ofCount: U.byteCount).map { chunk in
+            guard bytes.count >= I.byteCount else { return nil }
+            guard bytes.count.isMultiple(of: I.byteCount) else { return nil }
+            return bytes.chunks(ofCount: I.byteCount).map { chunk in
                 chunk.withUnsafeBytes {
-                    $0.load(as: U.self)
+                    $0.load(as: I.self)
                 }
             }
             .map { bigEndian ? $0.bigEndian : $0 }

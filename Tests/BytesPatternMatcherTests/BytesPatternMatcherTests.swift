@@ -20,9 +20,6 @@ final class BytesPatternMatcherTests: XCTestCase {
     
     
     func test_reverse_bits_in_byte() {
-        func invert(_ byte: UInt8) -> UInt8 {
-            circularRightShift(byte, 4)
-        }
         func s(_ uint8: UInt8) -> String {
             
             var bin = String(uint8, radix: 2)
@@ -35,21 +32,25 @@ final class BytesPatternMatcherTests: XCTestCase {
         func p(label: String, _ uint8: UInt8) {
             print("\(label)\t: \(s(uint8)) (0d\(uint8), 0x\(String(uint8, radix: 16)))")
         }
-        func doTestMagic(invert toInvert: UInt8, expected: UInt8, line: UInt = #line) {
-            let inverted = invert(toInvert)
-            p(label: "toInvert", toInvert)
-            p(label: "inverted", inverted)
+        func doTestMagic(
+            rotate toRotate: UInt8,
+            expected: UInt8,
+            line: UInt = #line
+        ) {
+            let rotated = rotateBits(of: toRotate)
+            p(label: "toRotate", toRotate)
+            p(label: "rotated", rotated)
             p(label: "expected", expected)
             XCTAssertEqual(
-                inverted,
+                rotated,
                 expected,
-                "inverted: \(s(inverted)) != \(s(expected)) (expected)",
+                "rotated: \(s(rotated)) != \(s(expected)) (expected)",
                 line: line
             )
         }
         /// `0x34` = `0d52` = `00110100`
         /// `0x43` = `0d67` = `01000011`
-        doTestMagic(invert: 0x34, expected: 0x43)
+        doTestMagic(rotate: 0x34, expected: 0x43)
     }
     
     func test_identical() throws {

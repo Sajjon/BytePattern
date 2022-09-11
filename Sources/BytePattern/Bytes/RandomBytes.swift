@@ -15,7 +15,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-extension UnsafeMutableRawBufferPointer {
+public extension UnsafeMutableRawBufferPointer {
     func initializeWithRandomBytes(count: Int) {
         guard count > 0 else {
             return

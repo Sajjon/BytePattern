@@ -50,10 +50,9 @@ finder.find(
 ) // `.sameIf([.reversedHex])`
 ```
 
-## `reverseOrderOfUInt64sFromBytes`
-And analogous `reverseOrderOfUInt32sFromBytes` and `reverseOrderOfUInt16sFromBytes`
+## `reverseOrderOfUInt16/32/64sFromBytes`
 
-Two byte sequences would be identical if one of them were "chunked" into segments of length two, i.e. as if loaded `UInt16` at start of each segment, and then this list of integers were reversed.
+Two byte sequences would be identical if one of them were "chunked" into segments of length 2/4/8, i.e. as if loaded `UInt16`/`UInt32`/`UInt64` at start of each segment, and then this list of integers were reversed, for `reverseOrderOfUInt16sFromBytes`/`reverseOrderOfUInt32sFromBytes`/`reverseOrderOfUInt64sFromBytes`.
 
 ```swift
 finder.find(
@@ -67,10 +66,9 @@ finder.find(
 ) // `.sameIf([.reverseOrderOfUInt16sFromBytes])`
 ```
 
-## `swapEndianessOfUInt64sFromBytes`
-And analogous `swapEndianessOfUInt32sFromBytes` and `swapEndianessOfUInt16sFromBytes`
+## `swapEndianessOfUInt16/32/64sFromBytes`
 
- Two byte sequences would be identical if one of them were "chunked" into segments of length two, i.e. as if loaded `UInt16` and we were to swap endianness of each integer in this list.
+ Two byte sequences would be identical if one of them were "chunked" into segments of length 2/4/8, i.e. as if loaded `UInt16`/`UInt32`/`UInt64` and we were to swap endianness of each integer in this list, for `swapEndianessOfUInt16sFromBytes`/`swapEndianessOfUInt32sFromBytes`/`swapEndianessOfUInt64sFromBytes`.
 
 ```swift
 finder.find(

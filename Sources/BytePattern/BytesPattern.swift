@@ -1,35 +1,37 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by Alexander Cyon on 2022-09-10.
 //
 
 import Foundation
 
-public enum BytesPattern: Equatable, CustomStringConvertible {
+public enum BytePattern: Equatable, CustomStringConvertible {
     case identical
     case sameIfRHS(AlmostSame)
 }
 
-public extension BytesPattern {
+public extension BytePattern {
     var description: String {
         switch self {
         case .identical: return "identical"
-        case .sameIfRHS(let value): return "sameIfRHS(\(value))"
+        case let .sameIfRHS(value): return "sameIfRHS(\(value))"
         }
     }
 }
 
-public extension BytesPattern {
+public extension BytePattern {
     struct AlmostSame: Equatable, ExpressibleByArrayLiteral, CustomStringConvertible {
         init(mutations: [Mutation]) {
             self.mutations = mutations
         }
+
         public typealias ArrayLiteralElement = Mutation
         public init(arrayLiteral mutations: ArrayLiteralElement...) {
             self.init(mutations: mutations)
         }
+
         private let mutations: [Mutation]
         public var description: String {
             "[" + mutations.map { String(describing: $0) }.joined(separator: ", ") + "]"
@@ -37,23 +39,22 @@ public extension BytesPattern {
     }
 }
 
-public extension BytesPattern {
+public extension BytePattern {
     enum Mutation: String, Equatable, CustomStringConvertible {
         case reversed
         case reversedHex
         case asSegmentsOfUInt16ButReversedOrder
         case asSegmentsOfUInt32ButReversedOrder
         case asSegmentsOfUInt64ButReversedOrder
-        
+
         case asSegmentsOfUInt16ButEndianessSwapped
         case asSegmentsOfUInt32ButEndianessSwapped
         case asSegmentsOfUInt64ButEndianessSwapped
-   
-        
+
         public var description: String {
             rawValue
         }
-        
+
         static func asSegmentsOfUIntButReversedOrder(uintByteCount: Int) -> Self {
             switch uintByteCount {
             case 2:
@@ -66,6 +67,7 @@ public extension BytesPattern {
                 fatalError("Bad bytecount: \(uintByteCount)")
             }
         }
+
         static func asSegmentsOfUIntButEndianessSwapped(uintByteCount: Int) -> Self {
             switch uintByteCount {
             case 2:

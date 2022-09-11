@@ -1,7 +1,7 @@
-import Foundation
 import Algorithms
+import Foundation
 
-/// A pattern matcher for bytes, useful to discover that two bytes seqences
+/// A pattern finder for bytes, useful to discover that two bytes seqences
 /// are almost identical, probably they are but during construction of one of
 /// them the developer has accidently either reversed the sequence, or
 /// they originate from integers, which might accidently use the wrong
@@ -59,25 +59,25 @@ import Algorithms
 /// `.almostIdentical([.endianessSwapped(for: .uint16), .reversed(.orderOfIntegers), .reversed(.entireSequenceAsBytes)])
 /// would result in the `identity`, i.e. `identical`, and does not work for just `uint16` but for any int.
 ///
-public struct BytesPatternMatcher {
+public struct BytePatternFinder {
     public init() {}
 }
 
-public extension BytesPatternMatcher {
+public extension BytePatternFinder {
     func find(
         between lhsContiguousBytes: some ContiguousBytes,
         and rhsContiguousBytes: some ContiguousBytes
-    ) -> BytesPattern? {
+    ) -> BytePattern? {
         var s = Storage()
-        
+
         // time complexity scoped: `O(n/2)`
         // time complexity so far: `O(n/2)`
-        return lhsContiguousBytes.withUnsafeBytes { lhs -> BytesPattern? in
-            rhsContiguousBytes.withUnsafeBytes { rhs -> BytesPattern? in
+        return lhsContiguousBytes.withUnsafeBytes { lhs -> BytePattern? in
+            rhsContiguousBytes.withUnsafeBytes { rhs -> BytePattern? in
                 guard lhs.count == rhs.count else {
-                    return BytesPattern?.none
+                    return BytePattern?.none
                 }
-                
+
                 guard
                     lhs.count.isMultiple(of: 2),
                     rhs.count.isMultiple(of: 2)
@@ -86,13 +86,13 @@ public extension BytesPatternMatcher {
                     return nil
                 }
 
-                for byteOffsetLSB in 0..<(lhs.count)/2 {
+                for byteOffsetLSB in 0 ..< (lhs.count) / 2 {
                     let byteOffsetMSB = lhs.count - byteOffsetLSB - 1 // -1 because zero indexed...
                     let lhsLSB = lhs.load(fromByteOffset: byteOffsetLSB, as: UInt8.self)
                     let lhsMBS = lhs.load(fromByteOffset: byteOffsetMSB, as: UInt8.self)
                     let rhsLSB = rhs.load(fromByteOffset: byteOffsetLSB, as: UInt8.self)
                     let rhsMSB = rhs.load(fromByteOffset: byteOffsetMSB, as: UInt8.self)
-          
+
                     s.update(
                         lhsLSB: lhsLSB,
                         lhsMSB: lhsMBS,
@@ -100,40 +100,39 @@ public extension BytesPatternMatcher {
                         rhsMSB: rhsMSB
                     )
                 }
-                
+
                 s.assertCorrectness()
-                
+
                 // time complexity scoped: `O(1)`
                 // time complexity so far: `O(n/2) + O(1)` <=> `O(n/2)`
                 if s.bools.sequenceIsIdentical {
                     return .identical
                 }
-                
+
                 // time complexity scoped: `O(1)`
                 // time complexity so far: `O(n/2) + O(1)` <=> `O(n/2)`
                 if s.bools.sequenceIsReversedIdenticalBytes {
                     return .sameIfRHS([.reversed])
                 }
-                
+
                 // time complexity scoped: `O(1)`
                 // time complexity so far: `O(n/2) + O(1)` <=> `O(n/2)`
                 if s.bools.sequenceIsReversedIdenticalHex {
                     return .sameIfRHS([.reversedHex])
                 }
-                
+
                 if let sameIfRHS = s.sameIfRHS() {
-                    return BytesPattern.sameIfRHS(sameIfRHS)
+                    return BytePattern.sameIfRHS(sameIfRHS)
                 }
-                
+
                 return nil
             }
         }
     }
 }
 
-
-extension FixedWidthInteger {
-    public static var byteCount: Int {
+public extension FixedWidthInteger {
+    static var byteCount: Int {
         bitWidth / 8
     }
 }
@@ -141,13 +140,12 @@ extension FixedWidthInteger {
 extension Data {
     init<I>(integers: [I], bigEndian: Bool = false) where I: FixedWidthInteger {
         self = integers
-            .map({ bigEndian ? $0.bigEndian.data : $0.data })
+            .map { bigEndian ? $0.bigEndian.data : $0.data }
             .reduce(Data()) { $0 + $1 }
     }
 }
 
 extension FixedWidthInteger {
-    
     var hex: String {
         data.hex
     }

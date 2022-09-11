@@ -4,37 +4,41 @@
 import PackageDescription
 
 let package = Package(
-    name: "BytesPatternMatcher",
+    name: "BytePattern",
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
-            name: "BytesPatternMatcher",
-            targets: ["BytesPatternMatcher"]),
+            name: "BytePattern",
+            targets: ["BytePattern"]
+        ),
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
-         .package(url: "https://github.com/apple/swift-algorithms", from: "1.0.0")
+        .package(url: "https://github.com/apple/swift-algorithms", from: "1.0.0"),
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
-            name: "BytesPatternMatcher",
+            name: "BytePattern",
             dependencies: [
                 .product(name: "Algorithms", package: "swift-algorithms"),
-            ]),
+            ]
+        ),
         .target(
             name: "BytesMutation",
             dependencies: [
-                "BytesPatternMatcher",
+                "BytePattern",
                 .product(name: "Algorithms", package: "swift-algorithms"),
-            ]),
+            ]
+        ),
         .testTarget(
-            name: "BytesPatternMatcherTests",
+            name: "BytePatternTests",
             dependencies: [
-                "BytesPatternMatcher",
+                "BytePattern",
                 "BytesMutation",
                 .product(name: "Algorithms", package: "swift-algorithms"),
-            ]),
+            ]
+        ),
     ]
 )

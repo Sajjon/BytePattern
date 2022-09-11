@@ -1,7 +1,7 @@
-# BytesPatternMatcher
+# BytePatternFinder
 
 
-A pattern matcher for bytes, useful to discover that two bytes seqences are almost identical, probably they are but during construction of one of them the developer has accidently either reversed the sequence, or they originate from integers, which might accidently use the wrong endianess, or a combination of both.
+A **linear time** byte pattern finder, useful to discover that two bytes seqences are almost identical, probably they are but during construction of one of them the developer has accidently either reversed the sequence, or they originate from integers, which might accidently use the wrong endianess, or a combination of both.
 
 **All examples below assume that the bytes sequences `LHS` and `RHS`
 have the same length.**

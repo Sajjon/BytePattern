@@ -1,4 +1,4 @@
-# BytePatternFinder
+# BytePattern
 
 
 A **linear time** byte pattern finder, useful to discover that two bytes seqences are almost identical, probably they are but during construction of one of them the developer has accidently either reversed the sequence, or they originate from integers, which might accidently use the wrong endianess, or a combination of both.
@@ -103,4 +103,109 @@ finder.find(
     lhs: "dead beef 1234",
     rhs: "edda ebfe 2143",
 ) // `sameIf([.swapEndianessOfUInt16sFromBytes, .reverseOrderOfUInt16sFromBytes, .reversedHex])`
+```
+
+# XCTAssertBytesEqual
+A small test util package which enables you to conveniently compare byte sequences using the `BytePatternFinder`. It contains some `XCTAssert` like methods, but specially tailored for byte sequence comparision.
+
+
+## XCTAssertBytesEqual
+
+
+```swift
+// This test will fail.
+// Assertion failure message is:
+// "Expected bytes in LHS to equal RHS, but they are not, however, they resemble each other with according to byte pattern: sameIf([swapEndianessOfUInt16sFromBytes])."
+func test_data_failing() throws {
+    try XCTAssertBytesEqual(
+        Data(hex: "ab12 cd34"),
+        Data(hex: "12ab 34cd"),
+        "An optional message goes here."
+    )
+}
+```
+
+You can change the behaviour of the test to pass for non-`identical` patterns found - but will still fail for no pattern found of course, by passing `passOnPatternNonIdentical: true`.
+
+```swift
+func test_data_passing() throws {
+    try XCTAssertBytesEqual(
+        Data(hex: "ab12 cd34"),
+        Data(hex: "12ab 34cd"),
+        "An optional message goes here.",
+        passOnPatternNonIdentical: true
+    )
+}
+```
+
+You can also opt in to interrupt on non-identical patterns found by passing `haltOnPatternNonIdentical: true`:
+
+```swift
+func test_data_passing_halting() throws {
+    try XCTAssertBytesEqual(
+        Data(hex: "ab12 cd34"),
+        Data(hex: "12ab 34cd"),
+        "An optional message goes here.",
+        passOnPatternNonIdentical: true,
+        haltOnPatternNonIdentical: true
+    )
+}
+```
+
+You can also globally change default value of `passOnPatternNonIdentical` and `haltOnPatternNonIdentical` by setting these properties on global type `DefaultXCTAssertBytesEqualParameters`. A good place to do this is in the `setUp()` method of your test class.
+
+
+```swift
+override func setUp() {
+    super.setUp()
+    DefaultXCTAssertBytesEqualParameters.passOnPatternNonIdentical = true
+    DefaultXCTAssertBytesEqualParameters.haltOnPatternNonIdentical = true
+}
+
+func test_data_passing_halting_defaulParamsUsed() throws {
+    try XCTAssertBytesEqual(
+        Data(hex: "ab12 cd34"),
+        Data(hex: "12ab 34cd")
+    )
+}
+```
+
+
+## XCTAssertBytesFromHexEqual
+
+The examples above can be simplified by used of `XCTAssertBytesFromHexEqual`, which will fail with error if you're passing in invalid hexadecimal strings.
+
+
+```swift
+func test_nonIdentical_but_passing() {
+    XCTAssertBytesFromHexEqual(
+        "ab12 cd34",
+        "12ab 34cd",
+        passOnPatternNonIdentical: true
+    )
+}
+```
+
+# BytesMutation
+
+This small package allows you to perform mutation on any byte sequence conforming to `ContiguousBytes` and which names mirror those of `BytePattern`.
+
+```swift
+public extension ContiguousBytes {
+    func reversed() -> [UInt8]
+
+    func reversedHex() -> [UInt8]
+
+    func reverseOrderOfUInt16sFromBytes() -> [UInt8]
+
+    func reverseOrderOfUInt32sFromBytes() -> [UInt8]
+
+    func reverseOrderOfUInt64sFromBytes() -> [UInt8]
+
+    func swapEndianessOfUInt16sFromBytes() -> [UInt8]
+
+    func swapEndianessOfUInt32sFromBytes() -> [UInt8]
+
+    func swapEndianessOfUInt64sFromBytes() -> [UInt8]
+}
 ```

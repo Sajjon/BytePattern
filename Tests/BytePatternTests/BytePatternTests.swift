@@ -8,25 +8,27 @@ import BytePattern
 import BytesMutation
 import Foundation
 import XCTest
+import XCTAssertBytesEqual
 
 final class BytePatternTests: XCTestCase {
-    fileprivate let sut = BytePatternFinder()
-
+    
     override func setUp() {
         super.setUp()
         continueAfterFailure = false
     }
-
+    
+    fileprivate let sut = BytePatternFinder()
+    
     func test_reverse_bits_in_byte() {
         func s(_ uint8: UInt8) -> String {
             var bin = String(uint8, radix: 2)
             while bin.count < 8 {
                 bin.insert("0", at: bin.startIndex)
             }
-
+            
             return bin
         }
-    
+        
         func doTestMagic(
             rotate toRotate: UInt8,
             expected: UInt8,
@@ -44,7 +46,7 @@ final class BytePatternTests: XCTestCase {
         /// `0x43` = `0d67` = `01000011`
         doTestMagic(rotate: 0x34, expected: 0x43)
     }
-
+    
     func test_identical() throws {
         let lhs = try Data(hex: "dead beef 1234 5678 abba 0912 deed fade")
         let rhs = try Data(hex: "dead beef 1234 5678 abba 0912 deed fade")
@@ -53,7 +55,7 @@ final class BytePatternTests: XCTestCase {
             .identical
         )
     }
-
+    
     func test_sameIf_reversed_short() throws {
         try doTestHex(
             lhs: "ab12 cd34",
@@ -63,7 +65,7 @@ final class BytePatternTests: XCTestCase {
             rhs.reversed()
         }
     }
-
+    
     func test_sameIf_reversed() throws {
         try doTestHex(
             lhs: "dead beef 1234 5678 abba 0912 deed fade",
@@ -73,7 +75,7 @@ final class BytePatternTests: XCTestCase {
             rhs.reversed()
         }
     }
-
+    
     func test_sameIf_reversedHex_short() throws {
         try doTestHex(
             lhs: "ab12 cd34",
@@ -83,7 +85,7 @@ final class BytePatternTests: XCTestCase {
             rhs.reversedHex()
         }
     }
-
+    
     func test_sameIf_reversedHex() throws {
         try doTestHex(
             lhs: "dead beef 1234 5678 abba 0912 deed fade",
@@ -93,7 +95,7 @@ final class BytePatternTests: XCTestCase {
             rhs.reversedHex()
         }
     }
-
+    
     func test_sameIf_reverseOrderOfUInt16sFromBytes_even_number_of_uint16() throws {
         try doTestHex(
             lhs: "dead beef 1234 5678",
@@ -103,7 +105,7 @@ final class BytePatternTests: XCTestCase {
             rhs.reverseOrderOfUInt16sFromBytes()
         }
     }
-
+    
     func test_sameIf_reverseOrderOfUInt16sFromBytes_odd_number_of_uint16() throws {
         try doTestHex(
             lhs: "dead beef 1234",
@@ -113,7 +115,7 @@ final class BytePatternTests: XCTestCase {
             rhs.reverseOrderOfUInt16sFromBytes()
         }
     }
-
+    
     func test_sameIf_swapEndianessOfUInt16sFromBytes_short() throws {
         try doTestHex(
             lhs: "ab12 cd34",
@@ -123,7 +125,7 @@ final class BytePatternTests: XCTestCase {
             rhs.swapEndianessOfUInt16sFromBytes()
         }
     }
-
+    
     func test_sameIf_swapEndianessOfUInt16sFromBytes() throws {
         try doTestHex(
             lhs: "dead beef 1234 5678 abba 0912 deed fade",
@@ -133,7 +135,7 @@ final class BytePatternTests: XCTestCase {
             rhs.swapEndianessOfUInt16sFromBytes()
         }
     }
-
+    
     func test_sameIf_swapEndianessOfUInt32sFromBytes() throws {
         try doTestHex(
             lhs: "deadbeef 12345678 abba0912 deedfade",
@@ -143,7 +145,7 @@ final class BytePatternTests: XCTestCase {
             rhs.swapEndianessOfUInt32sFromBytes()
         }
     }
-
+    
     func test_sameIf__swapEndianessOfUInt64sFromBytes() throws {
         try doTestHex(
             lhs: "deadbeef12345678 abba0912deedfade",
@@ -153,7 +155,7 @@ final class BytePatternTests: XCTestCase {
             rhs.swapEndianessOfUInt64sFromBytes()
         }
     }
-
+    
     func test_sameIf_swapEndianessOfUInt16sFromBytes_reverseOrderOfUInt16sFromBytes_reversedHex() throws {
         try doTestHex(
             lhs: "dead beef 1234",
@@ -166,7 +168,7 @@ final class BytePatternTests: XCTestCase {
                 .reversedHex()
         }
     }
-
+    
     func test_odd_byte_count_of_both_lhs_and_rhs_returns_nil() throws {
         try doTestHex(
             lhs: "deadbe",
@@ -174,7 +176,7 @@ final class BytePatternTests: XCTestCase {
             expectedPattern: nil
         )
     }
-
+        
     func test_odd_byte_count_of_lhs_returns_nil() throws {
         try doTestHex(
             lhs: "deadbe",
@@ -182,7 +184,7 @@ final class BytePatternTests: XCTestCase {
             expectedPattern: nil
         )
     }
-
+    
     func test_odd_byte_count_of_rhs_returns_nil() throws {
         try doTestHex(
             lhs: "dead",
@@ -190,7 +192,7 @@ final class BytePatternTests: XCTestCase {
             expectedPattern: nil
         )
     }
-
+    
     func test_rhs_and_lhs_different_byte_count_returns_nil() throws {
         try doTestHex(
             lhs: "dead",
@@ -198,22 +200,39 @@ final class BytePatternTests: XCTestCase {
             expectedPattern: nil
         )
     }
+    
+ 
+    func test_data_passing() throws {
+        try XCTAssertBytesEqual(
+            Data(hex: "ab12 cd34"),
+            Data(hex: "12ab 34cd"),
+            passOnPatternNonIdentical: true
+        )
+    }
 
+    func test_hex_passing() {
+        XCTAssertBytesFromHexEqual(
+            "ab12 cd34",
+            "12ab 34cd",
+            passOnPatternNonIdentical: true
+        )
+    }
+    
     // Peaks at 20 mb memory used, for a debug build this test
     // takes ~20 seconds on 2021 MBP M1.
-    func test_assert_linear_time_complexity() throws {
+    func skip_test_assert_linear_time_complexity() throws {
         var durationPerLength: [Int: TimeInterval] = [:]
         let lengths = (8 ... 17).map { exp in (pow(2, exp) as NSDecimalNumber).intValue }
         let iterationsPerLength = 10
-
+        
         let expectedPattern = BytePattern.sameIf([.swapEndianessOfUInt64sFromBytes, .reverseOrderOfUInt64sFromBytes, .reversedHex])
-
-
+        
+        
         let finder = BytePatternFinder()
         var timer = Timer()
         func measure(length: Int) -> TimeInterval {
             precondition(length.isMultiple(of: UInt64.byteCount))
-           
+            
             let lhs = [UInt8]([UInt64](repeating: 0xDEAD_BEEF_ABBA_DEAF, count: length / UInt64.byteCount).map { $0.data }.joined())
             let rhs = lhs
                 .swapEndianessOfUInt64sFromBytes()
@@ -230,10 +249,10 @@ final class BytePatternTests: XCTestCase {
             let averageTime = totalTime / TimeInterval(iterationsPerLength)
             return averageTime
         }
-
+        
         var durationLast: TimeInterval?
         var lengthLast: Int?
-
+        
         // Measure for each length
         lengths.forEach { length in
             let durationForLength = measure(length: length)
@@ -272,12 +291,12 @@ extension BytePatternTests {
             )
             return
         }
-
+        
         guard let expectedPattern else {
             XCTFail("Expected to not find any pattern, since `expectedPattern` is nil, but found pattern: \(String(describing: pattern))")
             return
         }
-
+        
         XCTAssertEqual(
             pattern,
             expectedPattern,
@@ -310,7 +329,7 @@ extension BytePatternTests {
             }
         }
     }
-
+    
     func doTestHex(
         lhs: String,
         rhs: String,

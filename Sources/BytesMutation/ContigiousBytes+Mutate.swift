@@ -26,13 +26,13 @@ private extension ContiguousBytes {
         }
     }
 
-    func _asSegmentsOfUIntButReversedOrder<I: FixedWidthInteger>(uIntType _: I.Type) -> [UInt8] {
+    func _reverseOrderOfUInt<I: FixedWidthInteger>(type _: I.Type) -> [UInt8] {
         into(I.self)!
             .reversed()
             .flatMap { $0.bigEndian.bytes }
     }
 
-    func _asSegmentsOfUIntButEndianessSwapped<I: FixedWidthInteger>(uIntType _: I.Type) -> [UInt8] {
+    func _swapEndianessOfUInt<I: FixedWidthInteger>(type _: I.Type) -> [UInt8] {
         into(I.self)!
             .flatMap { $0.littleEndian.bytes }
     }
@@ -56,26 +56,26 @@ public extension ContiguousBytes {
     }
 
     func reverseOrderOfUInt16sFromBytes() -> [UInt8] {
-        _asSegmentsOfUIntButReversedOrder(uIntType: UInt16.self)
+        _reverseOrderOfUInt(type: UInt16.self)
     }
 
     func reverseOrderOfUInt32sFromBytes() -> [UInt8] {
-        _asSegmentsOfUIntButReversedOrder(uIntType: UInt32.self)
+        _reverseOrderOfUInt(type: UInt32.self)
     }
 
     func reverseOrderOfUInt64sFromBytes() -> [UInt8] {
-        _asSegmentsOfUIntButReversedOrder(uIntType: UInt64.self)
+        _reverseOrderOfUInt(type: UInt64.self)
     }
 
     func swapEndianessOfUInt16sFromBytes() -> [UInt8] {
-        _asSegmentsOfUIntButEndianessSwapped(uIntType: UInt16.self)
+        _swapEndianessOfUInt(type: UInt16.self)
     }
 
     func swapEndianessOfUInt32sFromBytes() -> [UInt8] {
-        _asSegmentsOfUIntButEndianessSwapped(uIntType: UInt32.self)
+        _swapEndianessOfUInt(type: UInt32.self)
     }
 
     func swapEndianessOfUInt64sFromBytes() -> [UInt8] {
-        _asSegmentsOfUIntButEndianessSwapped(uIntType: UInt64.self)
+        _swapEndianessOfUInt(type: UInt64.self)
     }
 }

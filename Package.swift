@@ -11,6 +11,14 @@ let package = Package(
             name: "BytePattern",
             targets: ["BytePattern"]
         ),
+        .library(
+            name: "XCTAssertBytesEqual",
+            targets: ["XCTAssertBytesEqual"]
+        ),
+        .library(
+            name: "BytePattern",
+            targets: ["BytePattern"]
+        ),
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -26,6 +34,12 @@ let package = Package(
             ]
         ),
         .target(
+            name: "XCTAssertBytesEqual",
+            dependencies: [
+                "BytePattern"
+            ]
+        ),
+        .target(
             name: "BytesMutation",
             dependencies: [
                 "BytePattern",
@@ -35,9 +49,8 @@ let package = Package(
         .testTarget(
             name: "BytePatternTests",
             dependencies: [
-                "BytePattern",
-                "BytesMutation",
-                .product(name: "Algorithms", package: "swift-algorithms"),
+                "XCTAssertBytesEqual",
+                "BytesMutation"
             ]
         ),
     ]

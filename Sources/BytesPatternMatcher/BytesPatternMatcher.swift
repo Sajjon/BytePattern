@@ -78,7 +78,13 @@ public extension BytesPatternMatcher {
                     return BytesPattern?.none
                 }
                 
-                precondition(lhs.count.isMultiple(of: 2), "TODO handle odd length...")
+                guard
+                    lhs.count.isMultiple(of: 2),
+                    rhs.count.isMultiple(of: 2)
+                else {
+                    // Odd byte count not supported yet.
+                    return nil
+                }
 
                 for byteOffsetLSB in 0..<(lhs.count)/2 {
                     let byteOffsetMSB = lhs.count - byteOffsetLSB - 1 // -1 because zero indexed...

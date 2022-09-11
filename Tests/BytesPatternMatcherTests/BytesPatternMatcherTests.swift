@@ -177,23 +177,89 @@ final class BytesPatternMatcherTests: XCTestCase {
                 .reversedHex()
         }
     }
+    
+    func test_odd_byte_count_of_both_lhs_and_rhs_returns_nil() throws {
+        try doTestHex(
+            lhs: "deadbe",
+            rhs: "deadbe",
+            expectedPattern: nil
+        )
+    }
+    
+    func test_odd_byte_count_of_lhs_returns_nil() throws {
+        try doTestHex(
+            lhs: "deadbe",
+            rhs: "dead",
+            expectedPattern: nil
+        )
+    }
+    
+    func test_odd_byte_count_of_rhs_returns_nil() throws {
+        try doTestHex(
+            lhs: "dead",
+            rhs: "deadbe",
+            expectedPattern: nil
+        )
+    }
+    
+    func test_rhs_and_lhs_different_byte_count_returns_nil() throws {
+        try doTestHex(
+            lhs: "dead",
+            rhs: "deadbeef",
+            expectedPattern: nil
+        )
+    }
 }
 
 extension BytesPatternMatcherTests {
+    
     func doTest<RHS: ContiguousBytes>(
         lhs: some ContiguousBytes,
         rhs: RHS,
-        expectedPattern: BytesPattern,
-        line: UInt = #line,
-        mutateRHS: (RHS) -> some ContiguousBytes
+        expectedPattern: BytesPattern?,
+        mutateRHS: ((RHS) -> [UInt8])? = nil,
+        line: UInt = #line
     ) throws {
-        let pattern = sut.find(between: lhs, and: rhs)
+        guard let pattern = sut.find(between: lhs, and: rhs) else {
+            XCTAssertNil(
+                expectedPattern,
+                "No pattern found, expected `expectedPattern` to be nil, but it was not.",
+                line: line
+            )
+            XCTAssertNil(
+                mutateRHS,
+                "No pattern found, expected `mutateRHS` closure to be nil, but it was not.",
+                line: line
+            )
+            return
+        }
+        
+        guard let expectedPattern else {
+            XCTFail("Expected to not find any pattern, since `expectedPattern` is nil, but found pattern: \(String(describing: pattern))")
+            return
+        }
+        
         XCTAssertEqual(
            pattern,
            expectedPattern,
            "Found pattern does not match expected, found: \(String(describing: pattern)), expected: \(expectedPattern)",
            line: line
         )
+        guard pattern != .identical else {
+            XCTAssertNil(
+                mutateRHS,
+                "LHS and RHS is identical, expected `mutateRHS` closure to be nil, but it was not.",
+                line: line
+            )
+            return
+        }
+        guard let mutateRHS else {
+            XCTFail(
+                "LHS and RHS are not identical, expected `mutateRHS` to be present.",
+                line: line
+            )
+            return
+        }
         let mutatedRHS = mutateRHS(rhs)
         lhs.withUnsafeBytes { lhsBytes in
             mutatedRHS.withUnsafeBytes { mutatedRHSBytes in
@@ -210,16 +276,16 @@ extension BytesPatternMatcherTests {
     func doTestHex(
         lhs: String,
         rhs: String,
-        expectedPattern: BytesPattern,
-        line: UInt = #line,
-        mutateRHS: @escaping (any ContiguousBytes) -> some ContiguousBytes
+        expectedPattern: BytesPattern?,
+        mutateRHS: ((any ContiguousBytes) -> [UInt8])? = nil,
+        line: UInt = #line
     ) throws {
         try doTest(
             lhs: Data(hex: lhs),
             rhs: Data(hex: rhs),
             expectedPattern: expectedPattern,
-            line: line,
-            mutateRHS: mutateRHS
+            mutateRHS: mutateRHS,
+            line: line
         )
     }
 }

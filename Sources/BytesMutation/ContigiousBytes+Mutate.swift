@@ -55,27 +55,27 @@ public extension ContiguousBytes {
             }
     }
 
-    func asSegmentsOfUInt16ButReversedOrder() -> [UInt8] {
+    func reverseOrderOfUInt16sFromBytes() -> [UInt8] {
         _asSegmentsOfUIntButReversedOrder(uIntType: UInt16.self)
     }
 
-    func asSegmentsOfUInt32ButReversedOrder() -> [UInt8] {
+    func reverseOrderOfUInt32sFromBytes() -> [UInt8] {
         _asSegmentsOfUIntButReversedOrder(uIntType: UInt32.self)
     }
 
-    func asSegmentsOfUInt64ButReversedOrder() -> [UInt8] {
+    func reverseOrderOfUInt64sFromBytes() -> [UInt8] {
         _asSegmentsOfUIntButReversedOrder(uIntType: UInt64.self)
     }
 
-    func asSegmentsOfUInt16ButEndianessSwapped() -> [UInt8] {
+    func swapEndianessOfUInt16sFromBytes() -> [UInt8] {
         _asSegmentsOfUIntButEndianessSwapped(uIntType: UInt16.self)
     }
 
-    func asSegmentsOfUInt32ButEndianessSwapped() -> [UInt8] {
+    func swapEndianessOfUInt32sFromBytes() -> [UInt8] {
         _asSegmentsOfUIntButEndianessSwapped(uIntType: UInt32.self)
     }
 
-    func asSegmentsOfUInt64ButEndianessSwapped() -> [UInt8] {
+    func swapEndianessOfUInt64sFromBytes() -> [UInt8] {
         _asSegmentsOfUIntButEndianessSwapped(uIntType: UInt64.self)
     }
 }

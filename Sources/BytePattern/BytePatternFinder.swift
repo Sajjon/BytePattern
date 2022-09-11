@@ -1,7 +1,7 @@
 import Algorithms
 import Foundation
 
-/// A pattern finder for bytes, useful to discover that two bytes seqences
+/// A **linear time** byte pattern finder, useful to discover that two bytes seqences
 /// are almost identical, probably they are but during construction of one of
 /// them the developer has accidently either reversed the sequence, or
 /// they originate from integers, which might accidently use the wrong
@@ -18,45 +18,45 @@ import Foundation
 /// (
 ///     `dead beef 1234 5678 abba 0912 deed fade`,
 ///     `edaf deed 2190 abba 8765 4321 feeb daed`
-/// ) => `.almostIdentical([.entireReveresed(.entireSequenceAsHex)])`
+/// ) => `.sameIf([.entireReveresed(.entireSequenceAsHex)])`
 ///
 /// (
 ///     `dead beef 1234 5678 abba 0912 deed fade`,
 ///     `defa edde 1209 baab 7856 3412 efbe adde`
-/// ) => `.almostIdentical([.reversed(.entireSequenceAsBytes)])`
+/// ) => `.sameIf([.reversed(.entireSequenceAsBytes)])`
 ///
 /// (
 ///     `dead beef 1234`,
 ///     `1234 beef dead`
-/// ) => `.almostIdentical([.reversed(.orderOfIntegers(.uint16)))`
+/// ) => `.sameIf([.reversed(.orderOfIntegers(.uint16)))`
 ///
 /// (
 ///     `dead beef 1234 5678 abba 0912 deed fade`,
 ///     `adde efbe 3412 7856 baab 1209 edde defa`
-/// ) => `.almostIdentical([.endianessSwapped(for: .uint16)])`
+/// ) => `.sameIf([.endianessSwapped(for: .uint16)])`
 ///
 /// (
 ///     `deadbeef 12345678 abba0912 deedfade`, // grouped 4 bytes together
 ///     `efbeadde 78563412 1209baab defaedde`
-/// ) => `.almostIdentical([.endianessSwapped(for: .uint32)])`
+/// ) => `.sameIf([.endianessSwapped(for: .uint32)])`
 ///
 /// (
 ///     `deadbeef12345678 abba0912deedfade`, // grouped 8 bytes together
 ///     `78563412efbeadde defaedde1209baab`
-/// ) => `.almostIdentical([.endianessSwapped(for: .uint64)])`
+/// ) => `.sameIf([.endianessSwapped(for: .uint64)])`
 ///
 ///
 /// (
 ///     `dead beef 1234`,
 ///     `edda ebfe 2143`
-/// ) => `.almostIdentical([.endianessSwapped(for: .uint16), .reversed(.orderOfIntegers), .reversed(.entireSequenceAsHex)])`
+/// ) => `.sameIf([.endianessSwapped(for: .uint16), .reversed(.orderOfIntegers), .reversed(.entireSequenceAsHex)])`
 ///
 /// One thing to note is that these mutations:
-/// `.almostIdentical([.endianessSwapped(for: .uint16), .reversed(.orderOfIntegers)])``
-/// is the same as `.sameIfRHS([reversed(entireSequenceAsBytes)]))`.
+/// `.sameIf([.endianessSwapped(for: .uint16), .reversed(.orderOfIntegers)])``
+/// is the same as `.sameIf([reversed(entireSequenceAsBytes)]))`.
 ///
 /// Another thing to note is that these mutations:
-/// `.almostIdentical([.endianessSwapped(for: .uint16), .reversed(.orderOfIntegers), .reversed(.entireSequenceAsBytes)])
+/// `.sameIf([.endianessSwapped(for: .uint16), .reversed(.orderOfIntegers), .reversed(.entireSequenceAsBytes)])
 /// would result in the `identity`, i.e. `identical`, and does not work for just `uint16` but for any int.
 ///
 public struct BytePatternFinder {
@@ -112,17 +112,17 @@ public extension BytePatternFinder {
                 // time complexity scoped: `O(1)`
                 // time complexity so far: `O(n/2) + O(1)` <=> `O(n/2)`
                 if s.bools.sequenceIsReversedIdenticalBytes {
-                    return .sameIfRHS([.reversed])
+                    return .sameIf([.reversed])
                 }
 
                 // time complexity scoped: `O(1)`
                 // time complexity so far: `O(n/2) + O(1)` <=> `O(n/2)`
                 if s.bools.sequenceIsReversedIdenticalHex {
-                    return .sameIfRHS([.reversedHex])
+                    return .sameIf([.reversedHex])
                 }
 
-                if let sameIfRHS = s.sameIfRHS() {
-                    return BytePattern.sameIfRHS(sameIfRHS)
+                if let sameIf = s.sameIf() {
+                    return BytePattern.sameIf(sameIf)
                 }
 
                 return nil

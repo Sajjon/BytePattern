@@ -42,16 +42,16 @@ extension Storage {
         bools.assertCorrectness()
     }
 
-    func sameIfRHS() -> BytePattern.AlmostSame? {
-        if let mutation = lhs.u64Group.sameIfRHS(as: rhs.u64Group, expectedByteCountOfAllInts: numberOfBytesHandled) {
+    func sameIf() -> BytePattern.AlmostSame? {
+        if let mutation = lhs.u64Group.sameIf(as: rhs.u64Group, expectedByteCountOfAllInts: numberOfBytesHandled) {
             return mutation
         }
 
-        if let mutation = lhs.u32Group.sameIfRHS(as: rhs.u32Group, expectedByteCountOfAllInts: numberOfBytesHandled) {
+        if let mutation = lhs.u32Group.sameIf(as: rhs.u32Group, expectedByteCountOfAllInts: numberOfBytesHandled) {
             return mutation
         }
 
-        if let mutation = lhs.u16Group.sameIfRHS(as: rhs.u16Group, expectedByteCountOfAllInts: numberOfBytesHandled) {
+        if let mutation = lhs.u16Group.sameIf(as: rhs.u16Group, expectedByteCountOfAllInts: numberOfBytesHandled) {
             return mutation
         }
 

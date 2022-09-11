@@ -93,7 +93,7 @@ extension Storage.IntsGroup.FromBothEnds {
         lsbConcatMSB(\.nonRotated, bigEndian: false)
     }
 
-    func sameIfRHS(as other: Self, expectedByteCountOfAllInts: Int) -> BytePattern.AlmostSame? {
+    func sameIf(as other: Self, expectedByteCountOfAllInts: Int) -> BytePattern.AlmostSame? {
         Self._almostSame(self, as: other, expectedByteCountOfAllInts: expectedByteCountOfAllInts)
     }
 

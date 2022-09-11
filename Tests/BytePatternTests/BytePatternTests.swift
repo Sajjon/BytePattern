@@ -49,7 +49,7 @@ final class BytePatternTests: XCTestCase {
         let lhs = try Data(hex: "dead beef 1234 5678 abba 0912 deed fade")
         let rhs = try Data(hex: "dead beef 1234 5678 abba 0912 deed fade")
         XCTAssertEqual(
-            sut.find(between: lhs, and: rhs),
+            sut.find(lhs: lhs, rhs: rhs),
             .identical
         )
     }
@@ -223,7 +223,7 @@ final class BytePatternTests: XCTestCase {
             timer.start()
             var patternFound: BytePattern!
             for _ in 0 ..< iterationsPerLength {
-                patternFound = finder.find(between: lhs, and: rhs)
+                patternFound = finder.find(lhs: lhs, rhs: rhs)
             }
             XCTAssertEqual(patternFound, expectedPattern)
             let totalTime = timer.stop()
@@ -259,7 +259,7 @@ extension BytePatternTests {
         mutateRHS: ((RHS) -> [UInt8])? = nil,
         line: UInt = #line
     ) throws {
-        guard let pattern = sut.find(between: lhs, and: rhs) else {
+        guard let pattern = sut.find(lhs: lhs, rhs: rhs) else {
             XCTAssertNil(
                 expectedPattern,
                 "No pattern found, expected `expectedPattern` to be nil, but it was not.",

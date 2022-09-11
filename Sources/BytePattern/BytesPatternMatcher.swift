@@ -65,8 +65,8 @@ public struct BytePatternFinder {
 
 public extension BytePatternFinder {
     func find(
-        between lhsContiguousBytes: some ContiguousBytes,
-        and rhsContiguousBytes: some ContiguousBytes
+        lhs lhsContiguousBytes: some ContiguousBytes,
+        rhs rhsContiguousBytes: some ContiguousBytes
     ) -> BytePattern? {
         var s = Storage()
 

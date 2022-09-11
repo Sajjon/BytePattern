@@ -18,7 +18,6 @@ final class BytesPatternMatcherTests: XCTestCase {
         continueAfterFailure = false
     }
     
-    
     func test_reverse_bits_in_byte() {
         func s(_ uint8: UInt8) -> String {
             
@@ -81,7 +80,6 @@ final class BytesPatternMatcherTests: XCTestCase {
             rhs.reversed()
         }
     }
- 
 
     func test_sameIfRHS_reversedHex_short() throws {
         try doTestHex(
@@ -152,10 +150,8 @@ final class BytesPatternMatcherTests: XCTestCase {
             rhs.asSegmentsOfUInt32ButEndianessSwapped()
         }
     }
-    
 
     func test_sameIfRHS__asSegmentsOfUInt64ButEndianessSwapped() throws {
-
         try doTestHex(
             lhs: "deadbeef12345678 abba0912deedfade",
             rhs: "78563412efbeadde defaedde1209baab",
@@ -208,6 +204,71 @@ final class BytesPatternMatcherTests: XCTestCase {
             rhs: "deadbeef",
             expectedPattern: nil
         )
+    }
+    
+    // Peaks at 20 mb memory used, takes ~20 seconds on 2021 MBP M1.
+    func test_assert_linear_time_complexity() throws {
+        var byteSequencesPerLength: [Int: (lhs: Data, rhs: Data)] = [:]
+        var durationPerLength: [Int: TimeInterval] = [:]
+        let lengths = (8...17).map { exp in (pow(2, exp) as NSDecimalNumber).intValue }
+        let iterationsPerLength = 10
+        
+        let expectedPattern = BytesPattern.sameIfRHS([.asSegmentsOfUInt64ButEndianessSwapped, .asSegmentsOfUInt64ButReversedOrder, .reversedHex])
+        
+        lengths.forEach { byteCount in
+            precondition(byteCount.isMultiple(of: UInt64.byteCount))
+            let lhs = [UInt8]([UInt64](repeating: 0xdeadbeefabbadeaf, count: (byteCount / UInt64.byteCount)).map { $0.data }.joined())
+            let rhs = lhs
+                .asSegmentsOfUInt64ButEndianessSwapped()
+                .asSegmentsOfUInt64ButReversedOrder()
+                .reversedHex()
+            assert(
+                rhs
+                    .asSegmentsOfUInt64ButEndianessSwapped()
+                    .asSegmentsOfUInt64ButReversedOrder()
+                    .reversedHex() == lhs
+            )
+            byteSequencesPerLength[byteCount] = (lhs: Data(lhs), rhs: Data(rhs))
+        }
+        
+        let matcher = BytesPatternMatcher()
+        var timer = Timer()
+        func measure(length: Int) -> TimeInterval {
+            let (lhs, rhs) = byteSequencesPerLength[length]!
+            XCTAssertEqual(lhs.count, rhs.count)
+            XCTAssertEqual(lhs.count, length)
+            timer.start()
+            var patternFound: BytesPattern!
+            for _ in 0..<iterationsPerLength {
+                patternFound = matcher.find(between: lhs, and: rhs)
+            }
+            XCTAssertEqual(patternFound, expectedPattern)
+            let totalTime = timer.stop()
+            let averageTime = totalTime / TimeInterval(iterationsPerLength)
+            // Eagerly free memory
+            byteSequencesPerLength.removeValue(forKey: length)
+            return averageTime
+        }
+        
+        var durationLast: TimeInterval?
+        var lengthLast: Int?
+        
+        // Measure for each length
+        lengths.forEach { length in
+            let durationForLength = measure(length: length)
+            durationPerLength[length] = durationForLength
+            if let durationLast {
+                // Assert linear
+                let lengthFactor = Double(length) / Double(lengthLast!)
+                let timeFactor = durationForLength / durationLast
+                let timeFactorAdjustedForLength = timeFactor / lengthFactor
+                XCTAssertLessThanOrEqual(timeFactorAdjustedForLength, 1.2) // Out to be 1.0, but we give some leaway.
+            }
+            durationLast = durationForLength
+            lengthLast = length
+        }
+        
+        
     }
 }
 

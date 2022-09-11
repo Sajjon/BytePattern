@@ -108,42 +108,42 @@ extension Storage.IntsGroup.FromBothEnds {
         let rhsNonRotatedLE = rhs.nonRotatedLE
         let lhsNonRotatedLE = lhs.nonRotatedLE
         let rhsNonRotatedBE = rhs.nonRotatedBE
-        let lhsRotatedBE = lhs.rotatedBE
-        let lhsRotatedLE = lhs.rotatedLE
-        let rhsRotatedBE = rhs.rotatedBE
+//        let lhsRotatedBE = lhs.rotatedBE
+//        let lhsRotatedLE = lhs.rotatedLE
+//        let rhsRotatedBE = rhs.rotatedBE
         let rhsRotatedLE = rhs.rotatedLE
         
-        if let lhsNonRotatedBE {
-            print("lhsNonRotatedBE: " + lhsNonRotatedBE.map { String($0, radix: 16) }.joined(separator: ", "))
-        }
-        
-        if let rhsNonRotatedLE {
-            print("rhsNonRotatedLE: " + rhsNonRotatedLE.map { String($0, radix: 16) }.joined(separator: ", "))
-        }
-        
-        if let lhsNonRotatedLE {
-            print("lhsNonRotatedLE: " + lhsNonRotatedLE.map { String($0, radix: 16) }.joined(separator: ", "))
-        }
-        
-        if let rhsNonRotatedBE {
-            print("rhsNonRotatedBE: " + rhsNonRotatedBE.map { String($0, radix: 16) }.joined(separator: ", "))
-        }
-        
-        if let lhsRotatedBE {
-            print("lhsRotatedBE: " + lhsRotatedBE.map { String($0, radix: 16) }.joined(separator: ", "))
-        }
-        
-        if let lhsRotatedLE {
-            print("lhsRotatedLE: " + lhsRotatedLE.map { String($0, radix: 16) }.joined(separator: ", "))
-        }
-        
-        if let rhsRotatedBE {
-            print("rhsRotatedBE: " + rhsRotatedBE.map { String($0, radix: 16) }.joined(separator: ", "))
-        }
-        
-        if let rhsRotatedLE {
-            print("rhsRotatedLE: " + rhsRotatedLE.map { String($0, radix: 16) }.joined(separator: ", "))
-        }
+//        if let lhsNonRotatedBE {
+//            print("lhsNonRotatedBE: " + lhsNonRotatedBE.map { String($0, radix: 16) }.joined(separator: ", "))
+//        }
+//        
+//        if let rhsNonRotatedLE {
+//            print("rhsNonRotatedLE: " + rhsNonRotatedLE.map { String($0, radix: 16) }.joined(separator: ", "))
+//        }
+//        
+//        if let lhsNonRotatedLE {
+//            print("lhsNonRotatedLE: " + lhsNonRotatedLE.map { String($0, radix: 16) }.joined(separator: ", "))
+//        }
+//        
+//        if let rhsNonRotatedBE {
+//            print("rhsNonRotatedBE: " + rhsNonRotatedBE.map { String($0, radix: 16) }.joined(separator: ", "))
+//        }
+//        
+//        if let lhsRotatedBE {
+//            print("lhsRotatedBE: " + lhsRotatedBE.map { String($0, radix: 16) }.joined(separator: ", "))
+//        }
+//        
+//        if let lhsRotatedLE {
+//            print("lhsRotatedLE: " + lhsRotatedLE.map { String($0, radix: 16) }.joined(separator: ", "))
+//        }
+//        
+//        if let rhsRotatedBE {
+//            print("rhsRotatedBE: " + rhsRotatedBE.map { String($0, radix: 16) }.joined(separator: ", "))
+//        }
+//        
+//        if let rhsRotatedLE {
+//            print("rhsRotatedLE: " + rhsRotatedLE.map { String($0, radix: 16) }.joined(separator: ", "))
+//        }
         
         if let lhsNonRotatedLE, let rhsNonRotatedLE, lhsNonRotatedLE == .init(rhsNonRotatedLE.reversed()) {
             assert(lhsNonRotatedLE.count * I.byteCount == expectedByteCountOfAllInts, "Too few integers inspected")

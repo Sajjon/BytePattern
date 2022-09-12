@@ -16,8 +16,8 @@ let package = Package(
             targets: ["XCTAssertBytesEqual"]
         ),
         .library(
-            name: "BytePattern",
-            targets: ["BytePattern"]
+            name: "BytesMutation",
+            targets: ["BytesMutation"]
         ),
     ],
     dependencies: [

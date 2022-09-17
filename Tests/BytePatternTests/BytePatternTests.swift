@@ -19,10 +19,15 @@ final class BytePatternTests: XCTestCase {
     
     fileprivate let sut = BytePatternFinder()
     
+    func test_all_zero() throws {
+        let pattern = try sut.find(lhs: Data(hex: "0000"), rhs: Data(hex: "0000"))
+        XCTAssertEqual(pattern, .identical)
+    }
+    
     func test_reverse_bits_in_byte() {
-        func s(_ uint8: UInt8) -> String {
-            var bin = String(uint8, radix: 2)
-            while bin.count < 8 {
+        func s(_ uint8: UInt8, radix: Int = 2) -> String {
+            var bin = String(uint8, radix: radix)
+            while bin.count < ((8/radix)*2) {
                 bin.insert("0", at: bin.startIndex)
             }
             
@@ -38,13 +43,14 @@ final class BytePatternTests: XCTestCase {
             XCTAssertEqual(
                 rotated,
                 expected,
-                "rotated: \(s(rotated)) != \(s(expected)) (expected)",
+                "rotated: 0b: \(s(rotated)) != \(s(expected)) (expected), 0x \(s(rotated, radix: 16)) != \(s(expected, radix: 16)) (expected)",
                 line: line
             )
         }
         /// `0x34` = `0d52` = `00110100`
         /// `0x43` = `0d67` = `01000011`
         doTestMagic(rotate: 0x34, expected: 0x43)
+        
     }
     
     func test_identical() throws {
@@ -216,6 +222,15 @@ final class BytePatternTests: XCTestCase {
             "12ab 34cd",
             passOnPatternNonIdentical: true
         )
+    }
+    
+    func test_sparse_hex_string() throws {
+        let finder = BytePatternFinder()
+        let pattern = try finder.find(
+            lhs: Data(hex: "050d000000000000000000000000000000000000000000000000000000000000"),
+            rhs: Data(hex: "000000000000000000000000000000000000000000000000050d000000000000")
+        )
+        print(pattern)
     }
     
     // Peaks at 20 mb memory used, for a debug build this test

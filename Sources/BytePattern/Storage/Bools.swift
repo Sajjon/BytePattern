@@ -36,12 +36,13 @@ extension Storage.Bools {
 extension Storage.Bools {
     func assertCorrectness() {
         switch (sequenceIsIdentical, sequenceIsReversedIdenticalHex, sequenceIsReversedIdenticalBytes) {
+        case (true, true, true): break // valid, e.g. `0000` compared to `0000`
         case (true, false, false): break // valid
         case (false, true, false): break // valid
         case (false, false, true): break // valid
         case (false, false, false): break // valid
         default:
-            assertionFailure("Invalid detection, sequenceIsIdentical: \(sequenceIsIdentical), sequenceIsReversedIdenticalHex: \(sequenceIsReversedIdenticalHex), sequenceIsReversedIdenticalBytes: \(sequenceIsReversedIdenticalBytes)")
+            fatalError("Invalid detection, sequenceIsIdentical: \(sequenceIsIdentical), sequenceIsReversedIdenticalHex: \(sequenceIsReversedIdenticalHex), sequenceIsReversedIdenticalBytes: \(sequenceIsReversedIdenticalBytes)")
         }
         // All good
     }

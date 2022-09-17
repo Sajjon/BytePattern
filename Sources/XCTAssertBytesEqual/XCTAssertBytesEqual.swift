@@ -43,8 +43,8 @@ import BytePattern
 ///   - line: The line number where the failure occurs. The default is the line
 ///   number where you call this function.
 /// - Returns: A pattern of bytes found when comparing `LHS` with `RHS`.
-@MainActor
-@discardableResult public func XCTAssertBytesEqual(
+@discardableResult
+public func XCTAssertBytesEqual(
     _ lhs: some ContiguousBytes,
     _ rhs: some ContiguousBytes,
     _ message: String? = nil,

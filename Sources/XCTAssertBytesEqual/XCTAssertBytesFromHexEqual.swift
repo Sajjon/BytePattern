@@ -47,8 +47,8 @@ import BytePattern
 ///   - line: The line number where the failure occurs. The default is the line
 ///   number where you call this function.
 /// - Returns: A pattern of bytes found when comparing `LHS` with `RHS`.
-@MainActor
-@discardableResult public func XCTAssertBytesFromHexEqual(
+@discardableResult
+public func XCTAssertBytesFromHexEqual(
     _ lhsHex: String,
     _ rhsHex: String,
     _ maybeMessage: String? = nil,
